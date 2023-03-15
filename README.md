@@ -1,1 +1,2 @@
-# Rum_Shearwater
+# Isle of Rum Manx Shearwater Colony Estimate
+Spatial Analysis to estimate the size of the Isle of Rum Manx Shearwater *Puffinus puffinus* colony. Uses digital elevation models and NDVI data derived from Sentinel images to predict the number of occupied burrows over the whole colony extent. Bayesian heirachihcla model was built by Richard B. Sherley to estimate the number of occupied burrows from the total number of burrows calcualted
