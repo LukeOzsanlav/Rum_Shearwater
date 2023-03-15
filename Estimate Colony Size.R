@@ -49,7 +49,7 @@ library(stargazer)
 ##
 
 ## read in the colony bounding box
-Bound_box <- st_read(dsn = "Colony bounding box", 
+Bound_box <- st_read(dsn = "SpatialData", 
                      layer = "Rum colony bounding box")
 st_crs(Bound_box) ## check the crs of the layer
 prj_dd <- "EPSG:4326"
@@ -61,7 +61,7 @@ BB_Box <- as.data.frame(Bound_box[[2]][[1]][[1]]) ## create a bounding box of la
 ## MORE INFO ON DATA SET USED: SRTMGL1 (SRTM GL1 30m) https://portal.opentopography.org/apidocs/#/Public/getGlobalDem 
 DEM <- elevatr::get_elev_raster(locations = BB_Box, prj = prj_dd,
                                 src = "gl1", verbose = TRUE)
-DEM <-raster("Spatial data for analysis/Original_Rum_DEM.grd")
+DEM <-raster("SpatialData/Original_Rum_DEM.grd")
 DEM # get the raster info
 plot(DEM) # plot the raster
 
@@ -73,11 +73,11 @@ plot(DEM) # plot the raster
 ####---- 2: Import Sentinel 2 data and create spectral indices ----####
 
 ## Read in the data down loaded from Landviewer
-Sent_B02 <-raster("Spatial data for analysis/NDVI data/Sentinal 2 data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B02.tif")
-Sent_B03 <-raster("Spatial data for analysis/NDVI data/Sentinal 2 data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B03.tif")
-Sent_B04 <-raster("Spatial data for analysis/NDVI data/Sentinal 2 data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B04.tif")
-Sent_B08 <-raster("Spatial data for analysis/NDVI data/Sentinal 2 data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R20B08.tif")
-Sent_B8A <-raster("Spatial data for analysis/NDVI data/Sentinal 2 data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R20B8A.tif")
+Sent_B02 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B02.tif")
+Sent_B03 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B03.tif")
+Sent_B04 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B04.tif")
+Sent_B08 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R20B08.tif")
+Sent_B8A <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R20B8A.tif")
 # plot(Sent_B02)
 
 ## Create 20m x 20m versions of 10m rasters
@@ -131,8 +131,8 @@ Sent_stack_tr <- projectRaster(from = Sent_stack, to =DEM_reporj)
 plot(Sent_stack_tr[[2]])
 
 ## write out the transformed remote sensing data
-#writeRaster(Sent_stack_tr[[1]], filename = "Spatial data for analysis/For map 08-11/Sentinel_NDVI")
-#writeRaster(Sent_stack_tr[[2]], filename = "Spatial data for analysis/For map 08-11/Sentinel_SAVI")
+#writeRaster(Sent_stack_tr[[1]], filename = "SpatialData/For map 08-11/Sentinel_NDVI")
+#writeRaster(Sent_stack_tr[[2]], filename = "SpatialData/For map 08-11/Sentinel_SAVI")
 #writeRaster(DEM_reporj, filename = "Elevation")
 
 
@@ -177,10 +177,10 @@ Rum_stack@layers
 ##
 
 ## Read in the shape files with the colony shapefiles in
-Colony <- st_read(dsn = "Spatial data for analysis/New colony shapefiles", 
+Colony <- st_read(dsn = "SpatialData/New colony shapefiles", 
                           layer = "temp2")
 
-Additions <- st_read(dsn = "Spatial data for analysis/New colony shapefiles", 
+Additions <- st_read(dsn = "SpatialData/New colony shapefiles", 
                      layer = "Extra_shapes")
 
 ## make sure the shape files have the same crs
@@ -211,7 +211,7 @@ names(Colony_extent_raster) <- "colony_ext"
 
 ## write out the shape file of the extent of active burrows
 plot(Colony_comb_tr)
-#st_write(Colony_comb_tr, dsn = "Spatial data for analysis", 
+#st_write(Colony_comb_tr, dsn = "SpatialData", 
 #         layer = "Active_burrow_extent", driver = "ESRI Shapefile")
 
 
@@ -221,7 +221,7 @@ plot(Colony_comb_tr)
 ## Now Create colony shape file with colony ID ###
 
 ## read in the shape file of the colony boundaries
-Colony_outline <- st_read(dsn = "Spatial data for analysis", 
+Colony_outline <- st_read(dsn = "SpatialData", 
                           layer = "colony_boundaries")
 
 ## transform the CRS of the shape file to that of the Raster data
@@ -247,7 +247,7 @@ names(Colony_raster) <- "ColonyID"
 
 
 ## Save the colony data
-#writeRaster(Colony_raster, filename = "Spatial data for analysis/For map 08-11ColonyID")
+#writeRaster(Colony_raster, filename = "SpatialData/For map 08-11ColonyID")
 
 
 
@@ -258,11 +258,11 @@ names(Colony_raster) <- "ColonyID"
 ##
 
 ## Read in the centers of each density plot
-Plot_centers <- st_read(dsn = "Spatial data for analysis", 
+Plot_centers <- st_read(dsn = "SpatialData", 
                         layer = "centroid_survey_point")
 
 ## read in the density plot surveys
-Density_plots <- read.csv("Csv data/Denisty plot data.csv")
+Density_plots <- read.csv("TabularData/Denisty plot data.csv")
 Density_plots <- Density_plots[1:(nrow(Density_plots)-1),] ## remove last row as it just summaries
 
 
@@ -340,7 +340,7 @@ data.table::setnames(Dens_plots, old =c("Elevation", "slope", "NDVI", "SAVI"), n
 #write_csv(Dens_plots, file = "Spatial_covariates_for_density_plots.csv")
 
 ## write out the Density plot buffers
-#st_write(Dens_Buf, dsn = "Spatial data for analysis", 
+#st_write(Dens_Buf, dsn = "SpatialData", 
 #         layer = "Density_plots_Buff", driver = "ESRI Shapefile")
 
 
@@ -479,7 +479,7 @@ Colony_PredDens[values(Colony_PredDens)>0] <- Col_pixels2$Pred_dens
 Colony_PredDens[values(Colony_PredDens)==0] <- NA
 plot(Colony_PredDens)
 names(Colony_PredDens) <- "Predicted_Density"
-#writeRaster(Colony_PredDens, file = "Spatial data for analysis/New colony shapefiles/PredDensityRaster", overwrite=TRUE)
+#writeRaster(Colony_PredDens, file = "SpatialData/New colony shapefiles/PredDensityRaster", overwrite=TRUE)
 
 ## extract the predicted densities from the raster
 colnames(Col_pixels2)
@@ -496,7 +496,7 @@ Colony_NoBurrows[values(Colony_NoBurrows)>0] <- Col_pixels2$NoBurrows
 Colony_NoBurrows[values(Colony_NoBurrows)==0] <- NA
 plot(Colony_NoBurrows)
 names(Colony_NoBurrows) <- "No_burrows"
-#writeRaster(Colony_NoBurrows, file = "Spatial data for analysis/New colony shapefiles/DensityRaster")
+#writeRaster(Colony_NoBurrows, file = "SpatialData/New colony shapefiles/DensityRaster")
 
 ## return the total number of burrows
 sum(Col_pixels2$NoBurrows)
@@ -533,7 +533,7 @@ plot(Colony_strata)
 names(Colony_strata) <- "strata"
 
 ## Save this raster of strata so i can plot it in QGIS
-#writeRaster(Colony_strata, file = "Spatial data for analysis/New colony shapefiles/DensityStrata", overwrite=TRUE)
+#writeRaster(Colony_strata, file = "SpatialData/New colony shapefiles/DensityStrata", overwrite=TRUE)
 
 ## Calculate the surface area of each strata
 Strata_stack <- stack(Colony_strata, DEM_SurfaceArea2, Colony_PredDens, Colony_NoBurrows)
@@ -626,7 +626,7 @@ ggplot() +
 
 
 ## Read in a shapefile of the barkeval south slope section 
-Bark_slope <- st_read(dsn = "Spatial data for analysis", 
+Bark_slope <- st_read(dsn = "SpatialData", 
                      layer = "Bark_south_slope")
 plot(Bark_slope)
 
@@ -676,7 +676,7 @@ summary(All_pixels2)
 
 ## write out the data set
 PredDens_values2 <- subset(All_pixels2, select = c("SurfaceArea", "Pred_dens", "South_slope"))
-#write_csv(PredDens_values2, file = "Csv data/Predicted_densities_with_southslope.csv")
+#write_csv(PredDens_values2, file = "TabularData/Predicted_densities_with_southslope.csv")
 
 ## Check the number of burrows it is predicting in the colony and on that section of the south slope
 southslope <- All_pixels2 %>% filter(South_slope == 1)
@@ -685,13 +685,13 @@ sum(All_pixels2$Pred_dens*All_pixels2$SurfaceArea)
 
 
 ## Read in the data set with the predicted number of AOBs
-Pred_AOB <- read_csv("Csv data/Predicted_AOBs_Rich.csv")
+Pred_AOB <- read_csv("TabularData/Predicted_AOBs_Rich.csv")
 
 ## Bind on the column to denote if a pixel is on the south slope of Barkeval
 Pred_AOB$Bark_south <- All_pixels2$South_slope
 
 ## Now wirte this file back out 
-write_csv(Pred_AOB, file = "Csv data/Predicted_AOBs_with_southslope.csv")
+write_csv(Pred_AOB, file = "TabularData/Predicted_AOBs_with_southslope.csv")
 
 ## check the number of AOBs in the south slpoe and in the whole colony
 southslope2 <- Pred_AOB %>% filter(Bark_south == 1)
