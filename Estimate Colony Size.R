@@ -669,13 +669,13 @@ sum(All_pixels2$Pred_dens*All_pixels2$SurfaceArea)
 
 
 ## Read in the data set with the predicted number of AOBs
-Pred_AOB <- read_csv("Outputs/Tabular/Predicted_AOBs_Rich.csv")
+Pred_AOB <- read_csv("TabularData/Predicted_AOBs_Rich.csv")
 
 ## Bind on the column to denote if a pixel is on the south slope of Barkeval
 Pred_AOB$Bark_south <- All_pixels2$South_slope
 
 ## Now wirte this file back out 
-write_csv(Pred_AOB, file = "Outputs/TabularPredicted_AOBs_Barkeval_southslope.csv")
+write_csv(Pred_AOB, file = "Outputs/Tabular/Predicted_AOBs_Barkeval_southslope.csv")
 
 ## check the number of AOBs in the south slpoe and in the whole colony
 southslope2 <- Pred_AOB %>% filter(Bark_south == 1)
