@@ -59,8 +59,8 @@ BB_Box <- as.data.frame(Bound_box[[2]][[1]][[1]]) ## create a bounding box of la
 ## retrieve the raster elevation data
 ## units of the raster are lat longs
 ## MORE INFO ON DATA SET USED: SRTMGL1 (SRTM GL1 30m) https://portal.opentopography.org/apidocs/#/Public/getGlobalDem 
-DEM <- elevatr::get_elev_raster(locations = BB_Box, prj = prj_dd,
-                                src = "gl1", verbose = TRUE)
+# DEM <- elevatr::get_elev_raster(locations = BB_Box, prj = prj_dd,
+#                                 src = "gl1", verbose = TRUE)
 DEM <-raster("SpatialData/Original_Rum_DEM.grd")
 DEM # get the raster info
 plot(DEM) # plot the raster
@@ -73,11 +73,11 @@ plot(DEM) # plot the raster
 ####---- 2: Import Sentinel 2 data and create spectral indices ----####
 
 ## Read in the data down loaded from Landviewer
-Sent_B02 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B02.tif")
-Sent_B03 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B03.tif")
-Sent_B04 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R10B04.tif")
-Sent_B08 <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R20B08.tif")
-Sent_B8A <-raster("NDVI data/S2A_tile_20210530_B04-B03-B02-B8A-B80/S2A_tile_20210530_29VPD_0_R20B8A.tif")
+Sent_B02 <-raster("NDVI_data/S2A_tile_20210530_29VPD_0_R10B02.TIF")
+Sent_B03 <-raster("NDVI_data/S2A_tile_20210530_29VPD_0_R10B03.TIF")
+Sent_B04 <-raster("NDVI_data/S2A_tile_20210530_29VPD_0_R10B04.TIF")
+Sent_B08 <-raster("NDVI_data/S2A_tile_20210530_29VPD_0_R20B08.TIF")
+Sent_B8A <-raster("NDVI_data/S2A_tile_20210530_29VPD_0_R20B8A.TIF")
 # plot(Sent_B02)
 
 ## Create 20m x 20m versions of 10m rasters
@@ -131,9 +131,9 @@ Sent_stack_tr <- projectRaster(from = Sent_stack, to =DEM_reporj)
 plot(Sent_stack_tr[[2]])
 
 ## write out the transformed remote sensing data
-#writeRaster(Sent_stack_tr[[1]], filename = "SpatialData/For map 08-11/Sentinel_NDVI")
+writeRaster(Sent_stack_tr[[1]], filename = "Outputs/Spatial/Sentinel_NDVI")
 #writeRaster(Sent_stack_tr[[2]], filename = "SpatialData/For map 08-11/Sentinel_SAVI")
-#writeRaster(DEM_reporj, filename = "Elevation")
+writeRaster(DEM_reporj, filename = "Outputs/Spatial/Elevation")
 
 
 
@@ -146,12 +146,12 @@ plot(Sent_stack_tr[[2]])
 ## Calculate and save the slope of the raster
 DEM_slope <- terrain(DEM_reporj, opt="slope", unit= 'degrees', neighbors=8)
 # plot(DEM_slope)
-#writeRaster(DEM_slope, filename = "Slope")
+writeRaster(DEM_slope, filename = "Outputs/Spatial/Slope")
 
 ## Calculate and save the aspect of the raster
 DEM_aspect <- terrain(DEM_reporj, opt="aspect", unit= 'degrees', neighbors=8)
 # plot(DEM_aspect)
-#writeRaster(DEM_aspect, filename = "Aspect")
+writeRaster(DEM_aspect, filename = "Outputs/Spatial/Aspect")
 
 
 ## calculate the total surface area of each pixel
@@ -161,7 +161,7 @@ DEM_SurfaceArea <- surfaceArea(DEM_SpatPix, byCell = T)
 DEM_SurfaceArea2 <- as(DEM_SurfaceArea, "RasterLayer")
 plot(DEM_SurfaceArea2)
 names(DEM_SurfaceArea2) <- "SurfaceArea"
-#writeRaster(DEM_SurfaceArea2, filename = "SurfaceArea")
+writeRaster(DEM_SurfaceArea2, filename = "Outputs/Spatial/SurfaceArea")
 
 
 ## Create a Raster stack of all the spatial predictor vairables
@@ -211,8 +211,8 @@ names(Colony_extent_raster) <- "colony_ext"
 
 ## write out the shape file of the extent of active burrows
 plot(Colony_comb_tr)
-#st_write(Colony_comb_tr, dsn = "SpatialData", 
-#         layer = "Active_burrow_extent", driver = "ESRI Shapefile")
+st_write(Colony_comb_tr, dsn = "Outputs/Spatial", 
+         layer = "Active_burrow_extent", driver = "ESRI Shapefile")
 
 
 
@@ -245,9 +245,8 @@ plot(Colony_raster)
 names(Colony_raster) <- "ColonyID"
 
 
-
 ## Save the colony data
-#writeRaster(Colony_raster, filename = "SpatialData/For map 08-11ColonyID")
+writeRaster(Colony_raster, filename = "Outputs/Spatial/ColonyID")
 
 
 
@@ -337,7 +336,7 @@ data.table::setnames(Dens_plots, old =c("Elevation", "slope", "NDVI", "SAVI"), n
 
 
 ## write out this data set now
-#write_csv(Dens_plots, file = "Spatial_covariates_for_density_plots.csv")
+write_csv(Dens_plots, file = "Outputs/Tabular/Spatial_covs_for_density_plots.csv")
 
 ## write out the Density plot buffers
 #st_write(Dens_Buf, dsn = "SpatialData", 
@@ -435,7 +434,7 @@ ms2_sub6$Slope <- CIs3$WeightedBuff_slope_sc
 ms2_sub6$weight <- NULL
 
 ## create and save the model selection table
-#tab_df(ms2_sub6, digits = 2, alternate.rows = T, file = "Model_selection_table_files/Model_selection_table.doc")
+tab_df(ms2_sub6, digits = 2, alternate.rows = T, file = "Outputs/Tabular/Model_selection_table.doc")
 
 
 
@@ -472,14 +471,12 @@ Col_pixels2 <- cbind(Col_pixels2, Pred_dens)
 ####---- 11. Calculate number of burrows and surface for each pixel within the colony extent ----####
 ##
 
-
 ## Create raster of predicted density
 Colony_PredDens <- Colony_extent_raster
 Colony_PredDens[values(Colony_PredDens)>0] <- Col_pixels2$Pred_dens
 Colony_PredDens[values(Colony_PredDens)==0] <- NA
 plot(Colony_PredDens)
 names(Colony_PredDens) <- "Predicted_Density"
-#writeRaster(Colony_PredDens, file = "SpatialData/New colony shapefiles/PredDensityRaster", overwrite=TRUE)
 
 ## extract the predicted densities from the raster
 colnames(Col_pixels2)
@@ -496,9 +493,9 @@ Colony_NoBurrows[values(Colony_NoBurrows)>0] <- Col_pixels2$NoBurrows
 Colony_NoBurrows[values(Colony_NoBurrows)==0] <- NA
 plot(Colony_NoBurrows)
 names(Colony_NoBurrows) <- "No_burrows"
-#writeRaster(Colony_NoBurrows, file = "SpatialData/New colony shapefiles/DensityRaster")
+writeRaster(Colony_NoBurrows, file = "Outputs/Spatial/Burrow_Density")
 
-## return the total number of burrows
+## return the total number of burrows for each part of the colony
 sum(Col_pixels2$NoBurrows)
 sum(Col_pixels2$NoBurrows[Col_pixels2$ColonyID ==1])
 sum(Col_pixels2$NoBurrows[Col_pixels2$ColonyID ==2])
@@ -533,7 +530,7 @@ plot(Colony_strata)
 names(Colony_strata) <- "strata"
 
 ## Save this raster of strata so i can plot it in QGIS
-#writeRaster(Colony_strata, file = "SpatialData/New colony shapefiles/DensityStrata", overwrite=TRUE)
+writeRaster(Colony_strata, file = "Outputs/Spatial/Density_Strata", overwrite=TRUE)
 
 ## Calculate the surface area of each strata
 Strata_stack <- stack(Colony_strata, DEM_SurfaceArea2, Colony_PredDens, Colony_NoBurrows)
@@ -550,8 +547,6 @@ Strata_summary <- Strata_area %>%
 ##
 ####---- 13. Plot relationship between burrow density and spatial covariates ----####
 ##
-
-
 
 ModelTop <- glmmTMB(Density~ WeightedBuff_slope + WeightedBuff_Elevation + WeightedBuff_NDVI, 
                   data = Dens_plots, 
@@ -573,10 +568,6 @@ ggplot() +
         panel.grid.minor.x = element_blank(), strip.text.x = element_text(size = 13, face = "bold"))
 
 
-
-
-
-
 ## extract the fitted values plus CIs using the effects package
 effectz <- effects::effect(term= "WeightedBuff_slope", mod= ModelTop, xlevels= 100)
 effectz3 <- as.data.frame(effectz)
@@ -594,11 +585,6 @@ ggplot() +
 
 
 
-
-
-
-
-
 ## extract the fitted values plus CIs using the effects package
 effectz <- effects::effect(term= "WeightedBuff_Elevation", mod= ModelTop, xlevels= 100)
 effectz4 <- as.data.frame(effectz)
@@ -613,8 +599,6 @@ ggplot() +
         axis.text=element_text(size=13, face = "bold"), axis.title=element_text(size=17, face = "bold"), 
         plot.title = element_text(size=14, face="bold"), legend.text=element_text(size=12), legend.title=element_text(size=12),
         panel.grid.minor.x = element_blank(), strip.text.x = element_text(size = 13, face = "bold"))
-
-
 
 
 
@@ -685,13 +669,13 @@ sum(All_pixels2$Pred_dens*All_pixels2$SurfaceArea)
 
 
 ## Read in the data set with the predicted number of AOBs
-Pred_AOB <- read_csv("TabularData/Predicted_AOBs_Rich.csv")
+Pred_AOB <- read_csv("Outputs/Tabular/Predicted_AOBs_Rich.csv")
 
 ## Bind on the column to denote if a pixel is on the south slope of Barkeval
 Pred_AOB$Bark_south <- All_pixels2$South_slope
 
 ## Now wirte this file back out 
-write_csv(Pred_AOB, file = "TabularData/Predicted_AOBs_with_southslope.csv")
+write_csv(Pred_AOB, file = "Outputs/TabularPredicted_AOBs_Barkeval_southslope.csv")
 
 ## check the number of AOBs in the south slpoe and in the whole colony
 southslope2 <- Pred_AOB %>% filter(Bark_south == 1)
